@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/attendance_provider.dart';
 import 'history_screen.dart';
+import 'statistics_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,8 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Refresh UI every minute to update worked hours/remaining time/current time
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+    // Refresh UI every 30 seconds to update worked hours/remaining time/current time
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (mounted) setState(() {});
     });
   }
@@ -39,6 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Office Time Tracker'),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const StatisticsScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => Navigator.push(
@@ -105,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const Divider(),
             _buildStatusRow('Today\'s Goal', '9h 15m'),
             _buildStatusRow('Remaining', _formatDuration(provider.remainingTime)),
+            _buildWeeklyAverageRow(provider),
+            if (!provider.weeklyGoalMet)
+              _buildStatusRow('Deficit', _formatDuration(provider.deficit)),
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -141,6 +152,32 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildWeeklyAverageRow(AttendanceProvider provider) {
+    final isMet = provider.weeklyGoalMet;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Weekly Avg', style: TextStyle(fontSize: 16)),
+          Row(
+            children: [
+              Text(
+                _formatDuration(provider.weeklyAverage),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isMet ? '✅' : '❌',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLeaveStatusCard(AttendanceProvider provider) {
     final isAchieved = provider.isTargetAchieved;
     final today = provider.todayRecord;
@@ -164,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isAchieved ? 'Daily target achieved!' : 'Need ${_formatDuration(provider.remainingTime)} more',
+                    provider.leaveStatus,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -197,7 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildInfoTile('Check In', _formatTime(today?.checkIn), Icons.login),
         _buildInfoTile('Leave Time', _formatTime(provider.expectedLeaveTime), Icons.event_available),
-        _buildInfoTile('Worked', _formatDuration(today?.totalHours ?? Duration.zero), Icons.timer),
+        _buildInfoTile('Worked', _formatDuration(provider.currentWorkedTime), Icons.timer),
+        _buildInfoTile('Overtime', _formatDuration(provider.overtime), Icons.more_time),
+        provider.weeklyGoalMet
+            ? _buildInfoTile('Weekly Goal', 'Achieved', Icons.emoji_events)
+            : _buildInfoTile('Deficit', _formatDuration(provider.deficit), Icons.trending_down),
         _buildInfoTile('Check Out', _formatTime(today?.checkOut), Icons.logout),
       ],
     );

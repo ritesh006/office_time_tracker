@@ -2,15 +2,18 @@
 
 A Flutter application to help employees track office working hours and maintain a required daily average of 9 hours 15 minutes.
 
-## Features (v1.1)
+## Features (v1.3)
 
 - **Real-time Clock**: Current time displayed at the top.
-- **Enhanced Status Card**: View today's goal and remaining time at a glance.
+- **Enhanced Status Card**: View today's goal, remaining time, and weekly average at a glance.
+- **Weekly Average Tracker**: Calculates rolling average of the last 5 working days, including live updates for the current day.
+- **Goal Status Indicators**: Clear ✅/❌ indicators for daily target and weekly average policy.
+- **Overtime & Deficit Tracking**: Live monitoring of extra hours worked or time needed to meet the average.
+- **Statistics Screen**: Detailed summary of total days worked, total overtime, best day, and worst day.
 - **Dynamic Progress Bar**: Color-coded progress (Red < 50%, Orange < 90%, Green 100%).
-- **Leave Status**: Instant feedback on whether you can leave now or how much time is left.
-- **Expected Leave Time**: Automatically calculated as soon as you Check In.
-- **Check In / Check Out**: Manual logging with large, accessible buttons.
-- **History Screen**: View previous attendance records with daily totals.
+- **Leave Status**: Instant "Can I Leave Now?" feedback.
+- **Expected Leave Time**: Automatically calculated upon Check In.
+- **Check-Out Protection**: Prevents accidental overwriting of data.
 - **Local Storage**: Data persistence using `shared_preferences`.
 
 ## Tech Stack
