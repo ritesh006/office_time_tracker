@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:office_time_tracker/main.dart';
+import 'package:office_time_tracker/providers/attendance_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Home screen loads with required UI elements', (WidgetTester tester) async {
+    // We use a fresh provider for testing
+    final provider = AttendanceProvider();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Wrap MyApp with the provider as it's normally done in main.dart's runApp
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AttendanceProvider>.value(
+        value: provider,
+        child: const MyApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Allow animations and providers to settle
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 1. Verify App Bar Title
+    expect(find.text('Office Time Tracker'), findsOneWidget);
+    
+    // 2. Verify Dashboard Goals
+    expect(find.text('Today\'s Goal'), findsOneWidget);
+    expect(find.text('9h 15m'), findsWidgets); // One in dashboard, maybe one in status card
+
+    // 3. Verify Action Buttons
+    expect(find.text('CHECK IN'), findsOneWidget);
+    expect(find.text('CHECK OUT'), findsOneWidget);
+    
+    // 4. Verify History Icon is present
+    expect(find.byIcon(Icons.history), findsOneWidget);
   });
 }
