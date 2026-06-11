@@ -24,6 +24,8 @@ A Flutter application to help employees track office working hours and maintain 
 - **Storage**: SharedPreferences (Local)
 - **UI**: Material Design 3
 
+![CI](https://github.com/<username>/<repo>/actions/workflows/flutter-ci.yml/badge.svg)
+
 ## Folder Structure
 
 ```text
