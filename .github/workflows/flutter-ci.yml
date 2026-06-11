@@ -1,21 +1,36 @@
 name: Flutter CI
 
 on:
+  push:
+    branches:
+      - feature_gui_make
+      - main
+
   pull_request:
     branches:
       - main
 
 jobs:
-  analyze:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      - run: flutter pub get
+      - name: Install Dependencies
+        run: flutter pub get
 
-      - run: flutter analyze
+      - name: Analyze Code
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test
+
+      - name: Build Debug APK
+        run: flutter build apk --debug
